@@ -53,7 +53,7 @@ class ODIRDataset(Dataset):
     def __init__(self, df, is_train=True):
         self.df = df
         self.is_train = is_train
-        self.labels = df[['N','D','G', 'C', 'A', 'H', 'M', 'O']].values
+        self.labels = df[['N', 'C', 'A', 'H', 'M', 'O']].values
         # 数据增强
         self.transform = transforms.Compose([
         transforms.ToPILImage(),
@@ -229,7 +229,7 @@ def predict():
             predictions.append(outputs.cpu().numpy())
 
     y_test = np.concatenate(predictions)
-    for i, j in enumerate(['N','D','G', 'C', 'A', 'H', 'M', 'O']):
+    for i, j in enumerate(['N', 'C', 'A', 'H', 'M', 'O']):
         test[j] = y_test[:, i]
     test.drop(test.columns[[1, 2]], axis=1, inplace=True)
     test.to_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/SaintCHEN_ODIR.csv', index=False)
