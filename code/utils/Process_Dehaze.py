@@ -3,8 +3,8 @@ import cv2
 from Dehaze import dehaze_main  # 假设 dehaze_main 是从 Dehaze 模块导入的
 
 # 输入和输出文件夹
-input_dir = "./dataset/all/"
-output_dir = "./images_dehazed_train/"
+input_dir = "C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_All"
+output_dir = "C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Images_Dehazed"
 
 # 确保输出文件夹存在
 if not os.path.exists(output_dir):
