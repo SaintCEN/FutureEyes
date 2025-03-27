@@ -1,0 +1,186 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', '微软雅黑', sans-serif;
+}
+
+body {
+    background: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    padding: 2rem;
+}
+
+.title {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 2.2rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.upload-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column; /* 垂直排列内容 */
+    align-items: center; /* 水平居中对齐 */
+}
+
+.upload-row {
+    display: flex;
+    justify-content: space-between; /* 左右分布 */
+    gap: 1.5rem; /* 左右间距 */
+    width: 100%;
+}
+
+.upload-area {
+    border: 3px dashed #bdc3c7;
+    border-radius: 12px;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 48%; /* 限制宽度，使其适应同一行 */
+}
+
+.upload-area:hover {
+    border-color: #3498db;
+    background: #f8f9ff;
+}
+
+.upload-icon {
+    width: 60px;
+    height: 60px;
+    fill: #3498db;
+    margin-bottom: 1rem;
+}
+
+.upload-text {
+    color: #34495e;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.upload-subtext {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin: 0.8rem 0;
+}
+
+.upload-button {
+    background: #3498db;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.upload-button:hover {
+    background: #2980b9;
+}
+
+.supported-formats {
+    color: #95a5a6;
+    font-size: 0.85rem;
+    margin-top: 1.5rem;
+}
+
+/* 预览区域 */
+.preview-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem; /* 左右间距 */
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.preview-box {
+    background: #f8f9fa;
+    border-radius: 12px;
+    height: 300px;
+    width: 48%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.preview-placeholder {
+    color: #bdc3c7;
+    font-size: 1.2rem;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+}
+
+.preview-box.has-image .preview-placeholder {
+    display: none;
+}
+
+.preview-box.has-image .preview-image {
+    display: block;
+}
+
+/* 开始预测按钮样式 */
+.predict-button {
+    background: #2ecc71;
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: inline-block;
+    font-weight: 500;
+    margin-top: 2rem;
+}
+
+.predict-button:hover {
+    background: #27ae60;
+}
+
+/* 预测结果框样式 */
+.result-box {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #ecf0f1;
+    border-radius: 12px;
+}
+
+.result-box h2 {
+    font-size: 1.4rem;
+    color: #34495e;
+    margin-bottom: 1rem;
+}
+
+.result-box ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.result-box li {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin: 0.5rem 0;
+}

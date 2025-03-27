@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI眼科筛查系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">AI眼底图像疾病筛查系统</h1>
+        
+        <div class="upload-container">
+            <div class="upload-row">
+                <!-- 左眼上传区域 -->
+                <div class="upload-area" id="leftEyeDropZone">
+                    <h3>上传左眼图像</h3>
+                    <svg class="upload-icon" viewBox="0 0 24 24">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    <p class="upload-text">拖放图片文件至此区域</p>
+                    <input type="file" id="leftEyeFileInput" accept="image/*" hidden>
+                    <label for="leftEyeFileInput" class="upload-button">选择左眼图像文件</label>
+                    <p class="supported-formats">支持格式：JPG/PNG (最大 10MB)</p>
+                </div>
+
+                <!-- 右眼上传区域 -->
+                <div class="upload-area" id="rightEyeDropZone">
+                    <h3>上传右眼图像</h3>
+                    <svg class="upload-icon" viewBox="0 0 24 24">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    <p class="upload-text">拖放图片文件至此区域</p>
+                    <input type="file" id="rightEyeFileInput" accept="image/*" hidden>
+                    <label for="rightEyeFileInput" class="upload-button">选择右眼图像文件</label>
+                    <p class="supported-formats">支持格式：JPG/PNG (最大 10MB)</p>
+                </div>
+            </div>
+
+            <!-- 左眼和右眼预览区 -->
+            <div class="preview-row">
+                <div class="preview-box" id="leftEyePreviewBox">
+                    <div class="preview-placeholder">左眼图像预览区</div>
+                    <img id="leftEyePreview" class="preview-image">
+                </div>
+
+                <div class="preview-box" id="rightEyePreviewBox">
+                    <div class="preview-placeholder">右眼图像预览区</div>
+                    <img id="rightEyePreview" class="preview-image">
+                </div>
+            </div>
+
+            <!-- 开始预测按钮 -->
+            <button id="predictButton" class="predict-button" style="display: none;">开始预测</button>
+            
+            <!-- 预测结果展示 -->
+            <div class="result-box" id="resultBox" style="display: none;">
+                <h2>可能的疾病：</h2>
+                <ul id="resultList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const leftEyeDropZone = document.getElementById('leftEyeDropZone');
+        const rightEyeDropZone = document.getElementById('rightEyeDropZone');
+        const leftEyeFileInput = document.getElementById('leftEyeFileInput');
+        const rightEyeFileInput = document.getElementById('rightEyeFileInput');
+        const leftEyePreviewBox = document.getElementById('leftEyePreviewBox');
+        const rightEyePreviewBox = document.getElementById('rightEyePreviewBox');
+        const leftEyePreview = document.getElementById('leftEyePreview');
+        const rightEyePreview = document.getElementById('rightEyePreview');
+        const predictButton = document.getElementById('predictButton');
+        const resultBox = document.getElementById('resultBox');
+        const resultList = document.getElementById('resultList');
+
+        // 点击拖放区域触发文件选择
+        leftEyeDropZone.addEventListener('click', () => leftEyeFileInput.click());
+        rightEyeDropZone.addEventListener('click', () => rightEyeFileInput.click());
+
+        // 文件选择处理
+        leftEyeFileInput.addEventListener('change', (e) => handleFileSelect(e, 'left'));
+        rightEyeFileInput.addEventListener('change', (e) => handleFileSelect(e, 'right'));
+
+        let leftEyeDiagnosed = false;
+        let rightEyeDiagnosed = false;
+
+        function handleFileSelect(e, eye) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (eye === 'left') {
+                        leftEyePreview.src = e.target.result;
+                        leftEyePreviewBox.classList.add('has-image');
+                        leftEyeDiagnosed = true; // 左眼已上传
+                    } else if (eye === 'right') {
+                        rightEyePreview.src = e.target.result;
+                        rightEyePreviewBox.classList.add('has-image');
+                        rightEyeDiagnosed = true; // 右眼已上传
+                    }
+
+                    // 如果两个眼睛都上传了，则显示预测按钮
+                    if (leftEyeDiagnosed && rightEyeDiagnosed) {
+                        predictButton.style.display = 'inline-block';
+                        resultBox.style.display = 'none'; // 隐藏预测结果框
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 开始预测按钮点击事件
+        predictButton.addEventListener('click', () => {
+            // 模拟预测结果
+            const leftEyeDiseases = ['视网膜病变', '青光眼'];
+            const rightEyeDiseases = ['糖尿病性视网膜病变', '白内障'];
+
+            // 合并左眼和右眼的结果
+            const combinedResults = [...leftEyeDiseases, ...rightEyeDiseases];
+
+            // 显示预测结果
+            resultBox.style.display = 'block';
+            resultList.innerHTML = ''; // 清空结果
+
+            // 将每个疾病添加到列表中
+            combinedResults.forEach(disease => {
+                const listItem = document.createElement('li');
+                listItem.textContent = disease;
+                resultList.appendChild(listItem);
+            });
+        });
+    </script>
+</body>
+</html>
