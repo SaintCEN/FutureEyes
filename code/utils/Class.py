@@ -6,10 +6,10 @@ import random
 # 修改字母即可
 
 # 定义路径
-train_folder = 'dataset/all'  # 图像所在文件夹
-label_file = 'Training_Tag.xlsx'  # 标签文件路径
-output_folder_1 = 'dataset/Train_D/D'  # 标签为1的图像文件夹
-output_folder_2 = 'dataset/Train_D/Normal'  # 标签为0的图像文件夹
+train_folder = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_All'  # 图像所在文件夹
+label_file = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Training_Tag.xlsx'  # 标签文件路径
+output_folder_1 = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_D/D'  # 标签为1的图像文件夹
+output_folder_2 = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_D/Normal'  # 标签为0的图像文件夹
 
 # 创建输出文件夹，如果没有的话
 os.makedirs(output_folder_1, exist_ok=True)

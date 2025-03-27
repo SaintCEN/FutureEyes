@@ -175,7 +175,7 @@ def evaluate(model, loader, criterion, device):
             total += labels.size(0)
 
     return total_loss / len(loader), correct / total
-
+'''
 def train_model(model, train_loader, val_loader, epochs, device):
     # 计算类别权重
     train_labels = [d[2] for d in train_data]
@@ -218,8 +218,9 @@ def train_model(model, train_loader, val_loader, epochs, device):
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), 'best_model_G.pth')
+            torch.save(model.state_dict(), 'C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_G.pth')
             print(f"*** 保存最佳模型，验证集准确率: {best_val_acc:.4f} ***")
+            '''
 # -----------------------------
 # 预测部分
 # -----------------------------
@@ -268,7 +269,7 @@ class TestDataset(Dataset):
         return (left_img, right_img), img_id
 
 
-def predict(model_path='best_model_G.pth', test_dir='dataset/test', output_csv='Saint_ODIR.csv'):
+def predict(model_path='C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_G.pth', test_dir='C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Test_All', output_csv='C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/Saint_ODIR.csv'):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     model = GResNet50(pretrained=False).to(device)
@@ -313,9 +314,10 @@ def predict(model_path='best_model_G.pth', test_dir='dataset/test', output_csv='
 # -----------------------------
 if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    '''
     if True:
         # 加载数据
-        train_data, val_data = load_train_val_data('dataset/Train_G', val_ratio=0.2)
+        train_data, val_data = load_train_val_data('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_G', val_ratio=0.2)
         train_dataset = GDataset(train_data, transform=train_transform)
         val_dataset = GDataset(val_data, transform=test_transform)  # 验证集不使用数据增强
         train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True, num_workers=4)
@@ -324,5 +326,6 @@ if __name__ == '__main__':
         model = GResNet50(pretrained=True).to(device)
         # 训练
         train_model(model, train_loader, val_loader, epochs=20, device=device)
+        '''
     # 预测
     predict()

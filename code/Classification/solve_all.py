@@ -13,8 +13,8 @@ from tqdm import tqdm
 import os
 
 # 数据加载
-train = pd.read_excel('Training_Tag.xlsx')
-test = pd.read_csv('Saint_ODIR.csv')
+train = pd.read_excel('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Training_Tag.xlsx')
+test = pd.read_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/Saint_ODIR.csv')
 
 # 数据划分
 train_df, val_df = train_test_split(train, test_size=0.2,  random_state=73)
@@ -81,8 +81,8 @@ class ODIRDataset(Dataset):
 
     def __getitem__(self, idx):
         # 加载左右眼图像
-        left_path = os.path.join('dataset/all/', self.df.iloc[idx]['Left-Fundus'])
-        right_path = os.path.join('dataset/all/', self.df.iloc[idx]['Right-Fundus'])
+        left_path = os.path.join('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_All', self.df.iloc[idx]['Left-Fundus'])
+        right_path = os.path.join('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_All', self.df.iloc[idx]['Right-Fundus'])
         # 转为RGB
         left_img = cv2.cvtColor(cv2.imread(left_path), cv2.COLOR_BGR2RGB)
         right_img = cv2.cvtColor(cv2.imread(right_path), cv2.COLOR_BGR2RGB)
@@ -154,7 +154,7 @@ def train_model():
     # 训练循环
     epochs = 20
     best_val_loss = float('inf')  # 初始化最佳验证损失
-    best_model_path = 'best_model_all.pth'  # 定义最佳模型保存路径
+    best_model_path = 'C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_all.pth'  # 定义最佳模型保存路径
 
     for epoch in range(epochs):
         # 训练阶段
@@ -210,7 +210,7 @@ def predict():
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = EfficientNet().to(device)
-    model.load_state_dict(torch.load('best_model_all.pth'))
+    model.load_state_dict(torch.load('C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_all.pth'))
     model.eval()
 
     predictions = []
@@ -225,7 +225,7 @@ def predict():
     for i, j in enumerate(['N', 'C', 'A', 'H', 'M', 'O']):
         test[j] = y_test[:, i]
     test.drop(test.columns[[1, 2]], axis=1, inplace=True)
-    test.to_csv('SaintCHEN_ODIR.csv', index=False)
+    test.to_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/SaintCHEN_ODIR.csv', index=False)
 
 if __name__ == '__main__':
     train_model()
