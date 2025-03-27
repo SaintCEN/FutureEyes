@@ -81,8 +81,8 @@ class ODIRDataset(Dataset):
 
     def __getitem__(self, idx):
         # 加载左右眼图像
-        left_path = os.path.join('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_All', self.df.iloc[idx]['Left-Fundus'])
-        right_path = os.path.join('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_All', self.df.iloc[idx]['Right-Fundus'])
+        left_path = os.path.join('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/All/', self.df.iloc[idx]['Left-Fundus'])
+        right_path = os.path.join('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/All/', self.df.iloc[idx]['Right-Fundus'])
         # 转为RGB
         left_img = cv2.cvtColor(cv2.imread(left_path), cv2.COLOR_BGR2RGB)
         right_img = cv2.cvtColor(cv2.imread(right_path), cv2.COLOR_BGR2RGB)
@@ -205,6 +205,12 @@ def train_model():
 
 # 测试预测
 def predict():
+    test = pd.read_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/Saint_ODIR.csv')
+    # 新增：处理NaN和类型转换
+    test['Left-Fundus'] = test['Left-Fundus'].astype(str).replace('nan', '')
+    test['Right-Fundus'] = test['Right-Fundus'].astype(str).replace('nan', '')
+    test = test.dropna(subset=['Left-Fundus', 'Right-Fundus'])
+
     test_dataset = ODIRDataset(test, is_train=False)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
@@ -215,7 +221,8 @@ def predict():
 
     predictions = []
     with torch.no_grad():
-        for (left, right), _ in test_loader:
+        # 添加预测进度条
+        for (left, right), _ in tqdm(test_loader, desc="Predicting", leave=False):
             left = left.to(device)
             right = right.to(device)
             outputs = model(left, right)
@@ -228,5 +235,5 @@ def predict():
     test.to_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/SaintCHEN_ODIR.csv', index=False)
 
 if __name__ == '__main__':
-    train_model()
+    #train_model()
     predict()

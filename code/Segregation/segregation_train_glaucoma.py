@@ -9,7 +9,6 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-
 # ---------------------- 自定义数据集类 ----------------------
 class SegmentationDataset(Dataset):
     def __init__(self, image_dir, mask_dir, img_size=(320, 320), preprocess=False, tol=7):
@@ -49,7 +48,6 @@ class SegmentationDataset(Dataset):
         return image, mask
 
     def crop_image_from_gray(self, img, tol=7):
-        """裁剪图像中的黑色边框区域"""
         if img.ndim == 2:  # 灰度图
             mask = img > tol
             return img[np.ix_(mask.any(1), mask.any(0))]
