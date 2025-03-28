@@ -13,20 +13,21 @@ from tqdm import tqdm
 import os
 
 # 数据加载
-train = pd.read_excel('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Training_Tag.xlsx')
-test = pd.read_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/Saint_ODIR.csv')
+train = pd.read_excel('/tmp/pycharm_project_455/dataset/Training_Tag.xlsx')
+test = pd.read_csv('/tmp/pycharm_project_455/outputs/Saint_ODIR.csv')
 
 # 数据划分
 train_df, val_df = train_test_split(train, test_size=0.2,  random_state=73)
 
 # 平衡训练集中的正常样本数量
 # 定义正常样本的条件：N列为1，其他列全为0
-normal_condition = (train_df['N'] == 1) & (train_df.drop(columns=['N']).sum(axis=1) == 0)
+numeric_cols = train_df.drop(columns=['N']).select_dtypes(include=['int', 'float']).columns
+normal_condition = (train_df['N'] == 1) & (train_df[numeric_cols].sum(axis=1) == 0)
 normal_samples = train_df[normal_condition]
 non_normal_samples = train_df[~normal_condition]
 # 欠采样正常样本，使其数量等于非正常样本的数量
 n_non_normal = len(non_normal_samples)
-balanced_normal = normal_samples.sample(n=n_non_normal, random_state=73)
+balanced_normal = normal_samples.sample(n=int(n_non_normal/6), random_state=73)
 # 合并并打乱顺序
 balanced_train_df = pd.concat([balanced_normal, non_normal_samples], axis=0).sample(frac=1, random_state=73)
 train_df = balanced_train_df
@@ -92,8 +93,8 @@ class ODIRDataset(Dataset):
 
     def __getitem__(self, idx):
         # 加载左右眼图像
-        left_path = os.path.join('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/All/', self.df.iloc[idx]['Left-Fundus'])
-        right_path = os.path.join('C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/All/', self.df.iloc[idx]['Right-Fundus'])
+        left_path = os.path.join('/tmp/pycharm_project_455/dataset/All/', self.df.iloc[idx]['Left-Fundus'])
+        right_path = os.path.join('/tmp/pycharm_project_455/dataset/All/', self.df.iloc[idx]['Right-Fundus'])
         # 转为RGB
         left_img = cv2.cvtColor(cv2.imread(left_path), cv2.COLOR_BGR2RGB)
         right_img = cv2.cvtColor(cv2.imread(right_path), cv2.COLOR_BGR2RGB)
@@ -165,7 +166,7 @@ def train_model():
     # 训练循环
     epochs = 20
     best_val_loss = float('inf')  # 初始化最佳验证损失
-    best_model_path = 'C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_all.pth'  # 定义最佳模型保存路径
+    best_model_path = '/tmp/pycharm_project_455/models/best_model_all.pth'  # 定义最佳模型保存路径
 
     for epoch in range(epochs):
         # 训练阶段
@@ -216,7 +217,7 @@ def train_model():
 
 # 测试预测
 def predict():
-    test = pd.read_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/Saint_ODIR.csv')
+    test = pd.read_csv('/tmp/pycharm_project_455/outputs/Saint_ODIR.csv')
     # 新增：处理NaN和类型转换
     test['Left-Fundus'] = test['Left-Fundus'].astype(str).replace('nan', '')
     test['Right-Fundus'] = test['Right-Fundus'].astype(str).replace('nan', '')
@@ -227,7 +228,7 @@ def predict():
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = EfficientNet().to(device)
-    model.load_state_dict(torch.load('C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_all.pth'))
+    model.load_state_dict(torch.load('/tmp/pycharm_project_455/models/best_model_all.pth'))
     model.eval()
 
     predictions = []
@@ -243,7 +244,7 @@ def predict():
     for i, j in enumerate(['N', 'C', 'A', 'H', 'M', 'O']):
         test[j] = y_test[:, i]
     test.drop(test.columns[[1, 2]], axis=1, inplace=True)
-    test.to_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/SaintCHEN_ODIR.csv', index=False)
+    test.to_csv('/tmp/pycharm_project_455/outputs/SaintCHEN_ODIR.csv', index=False)
 
 if __name__ == '__main__':
     train_model()

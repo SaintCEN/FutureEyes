@@ -21,12 +21,13 @@ train_df, val_df = train_test_split(train, test_size=0.2,  random_state=73)
 
 # 平衡训练集中的正常样本数量
 # 定义正常样本的条件：N列为1，其他列全为0
-normal_condition = (train_df['N'] == 1) & (train_df.drop(columns=['N']).sum(axis=1) == 0)
+numeric_cols = train_df.drop(columns=['N']).select_dtypes(include=['int', 'float']).columns
+normal_condition = (train_df['N'] == 1) & (train_df[numeric_cols].sum(axis=1) == 0)
 normal_samples = train_df[normal_condition]
 non_normal_samples = train_df[~normal_condition]
 # 欠采样正常样本，使其数量等于非正常样本的数量
 n_non_normal = len(non_normal_samples)
-balanced_normal = normal_samples.sample(n=n_non_normal, random_state=73)
+balanced_normal = normal_samples.sample(n=int(n_non_normal), random_state=73)
 # 合并并打乱顺序
 balanced_train_df = pd.concat([balanced_normal, non_normal_samples], axis=0).sample(frac=1, random_state=73)
 train_df = balanced_train_df
