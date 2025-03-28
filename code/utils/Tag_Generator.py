@@ -9,4 +9,4 @@ for idx, row in df.iterrows():
     for col in categories:
         df2.at[idx, col] = 1 if row[col] > 0.5 else 0
 # 保存到新的 CSV 文件
-df.to_csv("Saint_ODIR_Labels.csv", index=False)
+df2.to_csv("Saint_ODIR_Labels.csv", index=False)
