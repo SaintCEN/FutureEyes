@@ -19,6 +19,17 @@ test = pd.read_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/Saint_ODIR.csv
 # 数据划分
 train_df, val_df = train_test_split(train, test_size=0.2,  random_state=73)
 
+# 平衡训练集中的正常样本数量
+# 定义正常样本的条件：N列为1，其他列全为0
+normal_condition = (train_df['N'] == 1) & (train_df.drop(columns=['N']).sum(axis=1) == 0)
+normal_samples = train_df[normal_condition]
+non_normal_samples = train_df[~normal_condition]
+# 欠采样正常样本，使其数量等于非正常样本的数量
+n_non_normal = len(non_normal_samples)
+balanced_normal = normal_samples.sample(n=n_non_normal, random_state=73)
+# 合并并打乱顺序
+balanced_train_df = pd.concat([balanced_normal, non_normal_samples], axis=0).sample(frac=1, random_state=73)
+train_df = balanced_train_df
 # 图像预处理
 #剪切黑色部分
 def crop_image_from_gray(img, tol=7):
@@ -235,5 +246,5 @@ def predict():
     test.to_csv('C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/SaintCHEN_ODIR.csv', index=False)
 
 if __name__ == '__main__':
-    #train_model()
+    train_model()
     predict()

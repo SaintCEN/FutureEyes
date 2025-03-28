@@ -3,60 +3,70 @@ import pandas as pd
 import shutil
 import random
 
-# 修改字母即可
-
 # 定义路径
-train_folder = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_All'  # 图像所在文件夹
-label_file = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Training_Tag.xlsx'  # 标签文件路径
-output_folder_1 = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_D/D'  # 标签为1的图像文件夹
-output_folder_2 = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_D/Normal'  # 标签为0的图像文件夹
+train_folder = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_All'
+label_file = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Training_Tag.xlsx'
+output_folder_1 = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_D/D'
+output_folder_2 = 'C:/Users/SaintCHEN/Desktop/FutureEyes/dataset/Train_D/Normal'
 
-# 创建输出文件夹，如果没有的话
+# 创建输出文件夹
 os.makedirs(output_folder_1, exist_ok=True)
 os.makedirs(output_folder_2, exist_ok=True)
 
 # 读取标签文件
 df = pd.read_excel(label_file)
 
-# 获取标签为1的图像文件名
-label_1_images_L = df[df['D'] == 1]['Left-Fundus'].tolist()
-label_1_images_R = df[df['D'] == 1]['Right-Fundus'].tolist()
+# 获取标签为1的图像（D列=1）
+label_1_images = df[df['D'] == 1][['Left-Fundus', 'Right-Fundus']].stack().tolist()
 
-# 获取标签为0的图像对（ID相同，左右眼对应）
-# 首先提取所有正常样本的ID
-normal_ids = df[df['N'] == 1]['ID'].unique().tolist()
-# 创建一个字典来存储ID对应的左右眼图像
+# 获取正常样本（N列=1且D列=0）
+normal_samples = df[(df['N'] == 1) & (df['D'] == 0)]
+normal_ids = normal_samples['ID'].unique().tolist()
+
+# 构建ID到图像的映射
 id_to_images = {}
 for id in normal_ids:
-    left_images = df[(df['ID'] == id) & (df['N'] == 1)]['Left-Fundus'].tolist()
-    right_images = df[(df['ID'] == id) & (df['N'] == 1)]['Right-Fundus'].tolist()
+    id_records = normal_samples[normal_samples['ID'] == id]
     id_to_images[id] = {
-        'left': left_images[0] if left_images else None,
-        'right': right_images[0] if right_images else None
+        'left': id_records['Left-Fundus'].iloc[0] if not id_records['Left-Fundus'].empty else None,
+        'right': id_records['Right-Fundus'].iloc[0] if not id_records['Right-Fundus'].empty else None
     }
 
-# 随机选择和标签1数量一样多的ID（确保左右眼对应）
-num_label_1 = len(label_1_images_L) + len(label_1_images_R)
-# 我们需要大约num_label_1/2个ID（因为每个ID平均有2个图像）
-num_ids_needed = max(1, round(num_label_1 / 2))
-random_ids = random.sample(normal_ids, min(num_ids_needed, len(normal_ids)))
-# 收集这些ID对应的所有图像
+# 计算需要选择的ID数量（考虑单眼情况）
+num_label_1 = len(label_1_images)
 random_label_0_images = []
-for id in random_ids:
-    if id_to_images[id]['left']:
-        random_label_0_images.append(id_to_images[id]['left'])
-    if id_to_images[id]['right']:
-        random_label_0_images.append(id_to_images[id]['right'])
+attempts = 0
 
-# 移动标签为1的图像到output_1文件夹
-for image in label_1_images_L:
-    image_path = os.path.join(train_folder, image)
-    shutil.copy(image_path, os.path.join(output_folder_1, image))
-for image in label_1_images_R:
-    image_path = os.path.join(train_folder, image)
-    shutil.copy(image_path, os.path.join(output_folder_1, image))
+# 动态选择直到满足数量或遍历所有ID
+while len(random_label_0_images) < num_label_1 and attempts < len(normal_ids):
+    random_id = random.choice(normal_ids)
+    left_img = id_to_images[random_id]['left']
+    right_img = id_to_images[random_id]['right']
 
-# 移动随机选择的标签为0的图像到output_2文件夹
-for image in random_label_0_images:
-    image_path = os.path.join(train_folder, image)
-    shutil.copy(image_path, os.path.join(output_folder_2, image))
+    # 添加存在的图像
+    if left_img and left_img not in random_label_0_images:
+        random_label_0_images.append(left_img)
+    if right_img and right_img not in random_label_0_images:
+        random_label_0_images.append(right_img)
+
+    # 去重处理
+    normal_ids = list(set(normal_ids))  # 防止重复选择
+    attempts += 1
+
+# 截取至目标数量
+random_label_0_images = random_label_0_images[:num_label_1]
+
+
+# 复制文件函数
+def safe_copy(file_list, destination):
+    for file in file_list:
+        src = os.path.join(train_folder, file)
+        if os.path.exists(src):
+            shutil.copy(src, os.path.join(destination, file))
+
+
+# 执行复制操作
+safe_copy(label_1_images, output_folder_1)
+safe_copy(random_label_0_images, output_folder_2)
+
+print(f"复制完成！D类图像：{len(label_1_images)}张，Normal类图像：{len(random_label_0_images)}张")
