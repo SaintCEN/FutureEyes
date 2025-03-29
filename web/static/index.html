@@ -110,26 +110,90 @@
             }
         }
 
-        // 开始预测按钮点击事件
-        predictButton.addEventListener('click', () => {
-            // 模拟预测结果
-            const leftEyeDiseases = ['视网膜病变', '青光眼'];
-            const rightEyeDiseases = ['糖尿病性视网膜病变', '白内障'];
+        // 替换原有的predictButton点击事件
+predictButton.addEventListener('click', async () => {
+    // 验证文件
+    if (!leftEyeFileInput.files[0] || !rightEyeFileInput.files[0]) {
+        alert('请上传左右眼图像');
+        return;
+    }
 
-            // 合并左眼和右眼的结果
-            const combinedResults = [...leftEyeDiseases, ...rightEyeDiseases];
+    // 显示加载状态
+    predictButton.disabled = true;
+    predictButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 预测中...';
 
-            // 显示预测结果
-            resultBox.style.display = 'block';
-            resultList.innerHTML = ''; // 清空结果
+    try {
+        // 创建FormData对象
+        const formData = new FormData();
+        formData.append('left', leftEyeFileInput.files[0]);
+        formData.append('right', rightEyeFileInput.files[0]);
 
-            // 将每个疾病添加到列表中
-            combinedResults.forEach(disease => {
+        // 发送请求
+        const response = await fetch('http://localhost:5000/api/predict', {
+            method: 'POST',
+            body: formData
+            // 注意：不要设置Content-Type，浏览器会自动处理multipart/form-data
+        });
+
+        // 处理响应
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || '请求失败');
+        }
+
+        const data = await response.json();
+
+        // 显示结果
+        resultBox.style.display = 'block';
+        resultList.innerHTML = '';
+
+        if (data.status === 'success') {
+            // 显示疾病结果
+            data.results.forEach(disease => {
                 const listItem = document.createElement('li');
+                listItem.className = 'result-item';
                 listItem.textContent = disease;
                 resultList.appendChild(listItem);
             });
-        });
+
+            // 可选：显示详细概率
+            console.log('详细预测概率:', data.probabilities);
+        } else {
+            throw new Error(data.message || '未知错误');
+        }
+    } catch (error) {
+        console.error('预测错误:', error);
+        alert(`预测失败: ${error.message}`);
+    } finally {
+        // 重置按钮状态
+        predictButton.disabled = false;
+        predictButton.textContent = '开始预测';
+    }
+});
+
+// 添加文件拖放支持
+[leftEyeDropZone, rightEyeDropZone].forEach(zone => {
+    zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+    });
+
+    zone.addEventListener('dragleave', () => {
+        zone.classList.remove('dragover');
+    });
+
+    zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const input = zone.id === 'leftEyeDropZone' ? leftEyeFileInput : rightEyeFileInput;
+            input.files = files;
+            handleFileSelect({target: input}, zone.id === 'leftEyeDropZone' ? 'left' : 'right');
+        }
+    });
+});
     </script>
 </body>
 </html>
