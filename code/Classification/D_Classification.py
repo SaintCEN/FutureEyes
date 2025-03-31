@@ -223,7 +223,7 @@ def train_model(model, train_loader, val_loader, epochs, device):
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), 'C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_D.pth')
+            torch.save(model.state_dict(), '/web/models/best_model_D.pth')
             print(f"*** 保存最佳模型，验证集准确率: {best_val_acc:.4f} ***")
 # -----------------------------
 # 预测部分

@@ -167,7 +167,7 @@ def train_model():
     # 训练循环
     epochs = 20
     best_val_loss = float('inf')  # 初始化最佳验证损失
-    best_model_path = 'C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_all.pth'  # 定义最佳模型保存路径
+    best_model_path = '/web/models/best_model_all.pth'  # 定义最佳模型保存路径
 
     for epoch in range(epochs):
         # 训练阶段
@@ -229,7 +229,7 @@ def predict():
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = EfficientNet().to(device)
-    model.load_state_dict(torch.load('C:/Users/SaintCHEN/Desktop/FutureEyes/models/best_model_all.pth'))
+    model.load_state_dict(torch.load('/web/models/best_model_all.pth'))
     model.eval()
 
     predictions = []

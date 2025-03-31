@@ -192,7 +192,7 @@ def predict():
             probs = torch.sigmoid(outputs).cpu().numpy()[0]
             other_diseases = ['N', 'C', 'A', 'H', 'M', 'O']
             for i, code in enumerate(other_diseases):
-                if probs[i] > 0.5:
+                if probs[i] > 0.7:
                     results.add(code)
 
         # 结果处理
