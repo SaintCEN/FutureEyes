@@ -7,6 +7,6 @@ categories = ['N', 'D', 'G', 'C', 'A', 'H', 'M', 'O']
 # 遍历每一行并更新每个类别的值
 for idx, row in df.iterrows():
     for col in categories:
-        df2.at[idx, col] = 1 if row[col] > 0.5 else 0
+        df2.at[idx, col] = 1 if ((col!='O' and row[col] > 0.5) or (col=='O' and row[col] > 0.7)) else 0
 # 保存到新的 CSV 文件
 df2.to_csv("C:/Users/SaintCHEN/Desktop/FutureEyes/outputs/Saint_ODIR_Labels.csv", index=False,float_format='%.0f')

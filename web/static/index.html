@@ -4,16 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI眼科筛查系统</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@500;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
         <h1 class="title">AI眼底图像疾病筛查系统</h1>
+        <p class="subtitle">算法解码眼底，科技守护光明</p>
+        <div class="eye-care-sidebar">
+            <h3>护眼建议</h3>
+            <ul class="eye-list">
+                <li>一、让眼睛劳逸结合</li>
+                <li>二、坐姿要正</li>
+                <li>三、下视15°角看电脑</li>
+                <li>四、保证眼睛湿润</li>
+                <li>五、常做眼保健操</li>
+                <li>六、热敷眼睛</li>
+                <li>七、睡眠充足</li>
+                <li>八、进行户外运动</li>
+                <li>九、定期体检，发现眼病尽早治疗。</li>
+            </ul>
+        </div>
         
+        <div class="disease-sidebar">
+            <h3>常见眼疾</h3>
+            <ul class="disease-list">
+                <li>糖尿病性视网膜病变</li>
+                <li>青光眼</li>
+                <li>正常</li>
+                <li>白内障</li>
+                <li>黄斑病变</li>
+                <li>高血压视网膜病变</li>
+                <li>病理性近视</li>
+                <li>其他眼底疾病</li>
+            </ul>
+        </div>
         <div class="upload-container">
+            <div class="upload-bg"></div>
             <div class="upload-row">
-                <!-- 左眼上传区域 -->
-                <div class="upload-area" id="leftEyeDropZone">
+                <div class="upload-area eye-scan-effect" id="leftEyeDropZone">
                     <h3>上传左眼图像</h3>
                     <svg class="upload-icon" viewBox="0 0 24 24">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -22,10 +53,10 @@
                     <input type="file" id="leftEyeFileInput" accept="image/*" hidden>
                     <label for="leftEyeFileInput" class="upload-button">选择左眼图像文件</label>
                     <p class="supported-formats">支持格式：JPG/PNG (最大 10MB)</p>
+                    
                 </div>
 
-                <!-- 右眼上传区域 -->
-                <div class="upload-area" id="rightEyeDropZone">
+                <div class="upload-area eye-scan-effect" id="rightEyeDropZone">
                     <h3>上传右眼图像</h3>
                     <svg class="upload-icon" viewBox="0 0 24 24">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -37,30 +68,32 @@
                 </div>
             </div>
 
-            <!-- 左眼和右眼预览区 -->
             <div class="preview-row">
                 <div class="preview-box" id="leftEyePreviewBox">
                     <div class="preview-placeholder">左眼图像预览区</div>
-                    <img id="leftEyePreview" class="preview-image">
+                    <img id="leftEyePreview" class="preview-image zoomIn">
                 </div>
 
                 <div class="preview-box" id="rightEyePreviewBox">
                     <div class="preview-placeholder">右眼图像预览区</div>
-                    <img id="rightEyePreview" class="preview-image">
+                    <img id="rightEyePreview" class="preview-image zoomIn">
                 </div>
             </div>
 
-            <!-- 开始预测按钮 -->
             <button id="predictButton" class="predict-button" style="display: none;">开始预测</button>
-            
-            <!-- 预测结果展示 -->
+
             <div class="result-box" id="resultBox" style="display: none;">
                 <h2>可能的疾病：</h2>
                 <ul id="resultList"></ul>
             </div>
         </div>
+        <div class="bio-scan">
+            <div class="scan-line"></div>
+            <div class="pulse-dots">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
     </div>
-
     <script>
         const leftEyeDropZone = document.getElementById('leftEyeDropZone');
         const rightEyeDropZone = document.getElementById('rightEyeDropZone');
@@ -74,11 +107,11 @@
         const resultBox = document.getElementById('resultBox');
         const resultList = document.getElementById('resultList');
 
-        // 点击拖放区域触发文件选择
+        
         leftEyeDropZone.addEventListener('click', () => leftEyeFileInput.click());
         rightEyeDropZone.addEventListener('click', () => rightEyeFileInput.click());
 
-        // 文件选择处理
+        
         leftEyeFileInput.addEventListener('change', (e) => handleFileSelect(e, 'left'));
         rightEyeFileInput.addEventListener('change', (e) => handleFileSelect(e, 'right'));
 
@@ -110,32 +143,32 @@
             }
         }
 
-        // 替换原有的predictButton点击事件
+        
 predictButton.addEventListener('click', async () => {
-    // 验证文件
+    
     if (!leftEyeFileInput.files[0] || !rightEyeFileInput.files[0]) {
         alert('请上传左右眼图像');
         return;
     }
 
-    // 显示加载状态
+    
     predictButton.disabled = true;
     predictButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 预测中...';
 
     try {
-        // 创建FormData对象
+        
         const formData = new FormData();
         formData.append('left', leftEyeFileInput.files[0]);
         formData.append('right', rightEyeFileInput.files[0]);
 
-        // 发送请求
+        
         const response = await fetch('http://localhost:5000/api/predict', {
             method: 'POST',
             body: formData
-            // 注意：不要设置Content-Type，浏览器会自动处理multipart/form-data
+           
         });
 
-        // 处理响应
+
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.message || '请求失败');
@@ -143,12 +176,12 @@ predictButton.addEventListener('click', async () => {
 
         const data = await response.json();
 
-        // 显示结果
+
         resultBox.style.display = 'block';
         resultList.innerHTML = '';
 
         if (data.status === 'success') {
-            // 显示疾病结果
+            
             data.results.forEach(disease => {
                 const listItem = document.createElement('li');
                 listItem.className = 'result-item';
@@ -156,7 +189,6 @@ predictButton.addEventListener('click', async () => {
                 resultList.appendChild(listItem);
             });
 
-            // 可选：显示详细概率
             console.log('详细预测概率:', data.probabilities);
         } else {
             throw new Error(data.message || '未知错误');
@@ -165,13 +197,12 @@ predictButton.addEventListener('click', async () => {
         console.error('预测错误:', error);
         alert(`预测失败: ${error.message}`);
     } finally {
-        // 重置按钮状态
+
         predictButton.disabled = false;
         predictButton.textContent = '开始预测';
     }
 });
 
-// 添加文件拖放支持
 [leftEyeDropZone, rightEyeDropZone].forEach(zone => {
     zone.addEventListener('dragover', (e) => {
         e.preventDefault();
